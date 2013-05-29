@@ -1,0 +1,52 @@
+select count(*) from (select * from  frequency where docid='10398_txt_earn')as x;
+
+select count(*) from (
+select term from  frequency where docid='10398_txt_earn' and count=1 
+UNION select term from  frequency where docid='925_txt_trade' and count=1)as x;
+
+
+select count(*) from (select docid, SUM(count) from frequency GROUP BY docid HAVING SUM(count)>300)as x;
+
+
+select docid, SUM(count) from frequency GROUP BY docid HAVING SUM(count)>300;
+
+select count(*)from (select docid from frequency where term IN ('transactions' and 'world'))as x;
+
+--multiply two matrices
+	
+create table D as SELECT A.row_num, B.col_num, SUM(A.value * B.value)
+  FROM A JOIN B ON A.col_num = B.row_num
+ GROUP BY A.row_num, B.col_num;
+ 
+ --question 3 
+SELECT similarity
+FROM(
+    SELECT  F1.docid as docid1, 
+            F2.docid as docid2, 
+            SUM(F1.count * F2.count) as similarity 
+    FROM Frequency as F1, Frequency as F2
+    WHERE F1.term = F2.term AND
+          F1.docid = '10080_txt_crude' AND 
+          F2.docid = '17035_txt_earn'
+   GROUP BY F1.docid, F2.docid);
+
+--assignment 4
+ 
+   CREATE VIEW Frequency_with_query AS
+   SELECT * FROM Frequency
+   UNION
+   SELECT 'q' as docid, 'washington' as term, 1 as count 
+   UNION
+   SELECT 'q' as docid, 'taxes' as term, 1 as count
+   UNION 
+   SELECT 'q' as docid, 'treasury' as term, 1 as count;
+
+
+   SELECT MAX(similarity)
+   FROM(
+       SELECT F2.docid as docid, SUM(F1.count * F2.count) as similarity 
+       FROM Frequency_with_query as F1, Frequency_with_query as F2
+       WHERE F1.term = F2.term AND
+             F1.docid = 'q' 
+       GROUP BY F1.docid, F2.docid);
+
